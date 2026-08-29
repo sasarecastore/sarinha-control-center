@@ -1,6 +1,6 @@
-# Botão de Discord
+# Publicação pública no GitHub
 
-- [ ] Adicionar botão de convite do Discord na tela de keys.
-- [ ] Usar o link fornecido pelo usuário sem alterações.
-- [ ] Verificar abertura em nova aba e responsividade.
-- [ ] Salvar checkpoint e sincronizar no GitHub.
+- [ ] Tornar o repositório público, conforme autorização do usuário.
+- [ ] Preparar build estático compatível com GitHub Pages.
+- [ ] Adicionar workflow do GitHub Actions para publicar o Pages.
+- [ ] Ativar o Pages e verificar o endereço `github.io`.

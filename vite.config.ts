@@ -204,8 +204,11 @@ function vitePluginStorageProxy(): Plugin {
 }
 
 const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector(), vitePluginStorageProxy()];
+const isGitHubActions = process.env.GITHUB_ACTIONS === "true";
+const githubRepository = process.env.GITHUB_REPOSITORY?.split("/")[1] ?? "sarinha-control-center";
 
 export default defineConfig({
+  base: isGitHubActions ? `/${githubRepository}/` : "/",
   plugins,
   resolve: {
     alias: {

@@ -11,7 +11,7 @@ const features: Feature[] = [
   { id: "aimbot", name: "Aimbot (Direct Head)", icon: Eye, group: "injection" },
   { id: "aim_assist", name: "Aim Assist (Suave)", icon: MousePointer2, group: "injection" },
 ];
-const managerUrl = (import.meta.env.VITE_KEY_MANAGER_API_URL as string | undefined)?.replace(/\/$/, "") ?? "";
+const managerUrl = ((import.meta.env.VITE_KEY_MANAGER_API_URL as string | undefined) ?? "https://sasarinha-573kbfhm.manus.space").replace(/\/$/, "");
 const OFFLINE_MESSAGE = "Keys pausadas para manutenção. Tenha paciência, a Sasarinha Mods está trabalhando.";
 
 export default function Home() {
@@ -45,7 +45,7 @@ export default function Home() {
     setError("");
     if (!managerUrl) { setError("O sistema de keys ainda não está conectado ao site."); return; }
     try {
-      const response = await fetch(`${managerUrl}/api/trpc/access.loginWithKey`, { method: "POST", headers: { "content-type": "application/json", accept: "application/json" }, body: JSON.stringify({ accessKey: key.trim(), appVersion: "1.1.1" }) });
+      const response = await fetch(`${managerUrl}/api/trpc/access.loginWithKey`, { method: "POST", headers: { "content-type": "application/json", accept: "application/json" }, body: JSON.stringify({ json: { accessKey: key.trim(), appVersion: "1.1.1" } }) });
       const payload = await response.json().catch(() => null);
       if (!response.ok) throw new Error(payload?.error?.json?.message ?? payload?.error?.message ?? "Key inválida ou indisponível.");
       setLoggedIn(true);

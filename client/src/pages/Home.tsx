@@ -45,9 +45,13 @@ export default function Home() {
     setError("");
     if (!managerUrl) { setError("O sistema de keys ainda não está conectado ao site."); return; }
     try {
-      const response = await fetch(`${managerUrl}/api/trpc/access.loginWithKey`, { method: "POST", headers: { "content-type": "application/json", accept: "application/json" }, body: JSON.stringify({ json: { accessKey: key.trim(), appVersion: "1.1.1" } }) });
+      const response = await fetch(`${managerUrl}/api/trpc/access.loginWithKey?batch=1`, { method: "POST", headers: { "content-type": "application/json", accept: "application/json" }, body: JSON.stringify({ "0": { json: { accessKey: key.trim(), appVersion: "1.1.1" } } }) });
       const payload = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(payload?.error?.json?.message ?? payload?.error?.message ?? "Key inválida ou indisponível.");
+      const envelope = Array.isArray(payload) ? payload[0] : payload;
+      const errorMessage = envelope?.error?.json?.message ?? envelope?.error?.message ?? "Key inválida ou indisponível.";
+      if (!response.ok || envelope?.error) throw new Error(errorMessage);
+      const result = envelope?.result?.data?.json ?? envelope?.result?.data;
+      if (!result?.role) throw new Error("Resposta inválida do sistema de keys.");
       setLoggedIn(true);
       setNotice("Key validada e acesso autorizado nesta sessão");
     } catch (validationError) {

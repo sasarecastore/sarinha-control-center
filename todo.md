@@ -1,7 +1,7 @@
-# Correção da validação de keys
+# Investigação da validação positiva
 
-- [ ] Reproduzir a chamada ao endpoint real com o formato usado pelo site.
-- [ ] Comparar com o cliente tRPC do app e identificar a diferença.
-- [ ] Corrigir o frontend sem reintroduzir key demonstrativa.
-- [ ] Testar respostas válidas e inválidas no fluxo real.
-- [ ] Salvar checkpoint e sincronizar o GitHub.
+- [ ] Reproduzir a chamada publicada usando o cliente oficial do Manager.
+- [ ] Confirmar payload, versão, cookies, dispositivo e origem exigidos.
+- [ ] Corrigir o site com base no contrato observado.
+- [ ] Testar uma key válida real fornecida pelo usuário ou pelo fluxo oficial.
+- [ ] Salvar checkpoint e sincronizar a correção no GitHub.

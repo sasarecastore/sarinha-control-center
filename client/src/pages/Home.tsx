@@ -13,6 +13,14 @@ const features: Feature[] = [
 ];
 const managerUrl = ((import.meta.env.VITE_KEY_MANAGER_API_URL as string | undefined) ?? "https://sasarinha-573kbfhm.manus.space").replace(/\/$/, "");
 const OFFLINE_MESSAGE = "Keys pausadas para manutenção. Tenha paciência, a Sasarinha Mods está trabalhando.";
+const DEVICE_ID_KEY = "sarinha-control-device-id";
+function getDeviceId() {
+  const existing = window.localStorage.getItem(DEVICE_ID_KEY);
+  if (existing) return existing;
+  const created = typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `web-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  window.localStorage.setItem(DEVICE_ID_KEY, created);
+  return created;
+}
 
 export default function Home() {
   const [managerOnline, setManagerOnline] = useState<boolean | null>(null);
@@ -44,14 +52,28 @@ export default function Home() {
     event.preventDefault();
     setError("");
     if (!managerUrl) { setError("O sistema de keys ainda não está conectado ao site."); return; }
+    const normalizedKey = key.trim().toUpperCase();
+    if (!normalizedKey) { setError("Digite uma key de acesso."); return; }
     try {
-      const response = await fetch(`${managerUrl}/api/trpc/access.loginWithKey?batch=1`, { method: "POST", headers: { "content-type": "application/json", accept: "application/json" }, body: JSON.stringify({ "0": { json: { accessKey: key.trim(), appVersion: "1.1.1" } } }) });
+      const statusResponse = await fetch(`${managerUrl}/api/trpc/appStatus`, { headers: { accept: "application/json" } });
+      const statusPayload = await statusResponse.json().catch(() => null);
+      const isOnline = statusPayload?.result?.data?.json?.isOnline ?? statusPayload?.result?.data?.isOnline;
+      if (isOnline === false) {
+        const ownerResponse = await fetch(`${managerUrl}/api/trpc/access.loginWithKey?batch=1`, { method: "POST", headers: { "content-type": "application/json", accept: "application/json" }, body: JSON.stringify({ "0": { json: { accessKey: normalizedKey, appVersion: "1.1.1" } } }) });
+        const ownerPayload = await ownerResponse.json().catch(() => null);
+        const ownerEnvelope = Array.isArray(ownerPayload) ? ownerPayload[0] : ownerPayload;
+        const ownerResult = ownerEnvelope?.result?.data?.json ?? ownerEnvelope?.result?.data;
+        if (!ownerResponse.ok || ownerEnvelope?.error || ownerResult?.role !== "owner") throw new Error(`${OFFLINE_MESSAGE} O acesso do dono continua disponível.`);
+        setLoggedIn(true);
+        setNotice("Acesso do dono autorizado durante a manutenção");
+        return;
+      }
+      const response = await fetch(`${managerUrl}/api/trpc/keys.validate?batch=1`, { method: "POST", headers: { "content-type": "application/json", accept: "application/json" }, body: JSON.stringify({ "0": { json: { keyValue: normalizedKey, deviceId: getDeviceId() } } }) });
       const payload = await response.json().catch(() => null);
       const envelope = Array.isArray(payload) ? payload[0] : payload;
-      const errorMessage = envelope?.error?.json?.message ?? envelope?.error?.message ?? "Key inválida ou indisponível.";
-      if (!response.ok || envelope?.error) throw new Error(errorMessage);
       const result = envelope?.result?.data?.json ?? envelope?.result?.data;
-      if (!result?.role) throw new Error("Resposta inválida do sistema de keys.");
+      const reasonMessages: Record<string, string> = { not_found: "Key inválida.", expired: "Esta key expirou.", paused: "Esta key está pausada.", device: "Esta key já está vinculada a outro dispositivo." };
+      if (!response.ok || envelope?.error || result?.ok !== true) throw new Error(reasonMessages[result?.reason] ?? "Não foi possível validar a key.");
       setLoggedIn(true);
       setNotice("Key validada e acesso autorizado nesta sessão");
     } catch (validationError) {

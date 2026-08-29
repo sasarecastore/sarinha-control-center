@@ -1,6 +1,6 @@
 // Design: Neon Operacional adaptado à referência — login compacto, aviso de manutenção e validação real via Sasarinha Manager.
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { ArrowUpCircle, Crosshair, Cpu, Eye, Layers, LockKeyhole, LogIn, MousePointer2, Radio, Target, Zap } from "lucide-react";
+import { ArrowUpCircle, Crosshair, Cpu, Eye, Layers, LockKeyhole, LogIn, MessageCircle, MousePointer2, Radio, Target, Zap } from "lucide-react";
 
 type Feature = { id: string; name: string; icon: typeof Zap; group: "headshot" | "injection" };
 const features: Feature[] = [
@@ -93,7 +93,7 @@ export default function Home() {
   }
 
   if (!loggedIn) return <main className="auth-screen"><div className="galaxy-bg" aria-hidden="true" />{managerOnline === false && <OfflineBanner ownerAccess />}
-    <section className="login-box" aria-labelledby="login-title"><div className="login-brand"><img src="/manus-storage/sarinha-mark_265ada7f.png" alt="" /><span>SARINHA<br /><b>PROXY</b></span></div><div className="auth-divider" /><div className="vip-heading"><LockKeyhole size={16} /><span>ACESSO PRIVADO</span></div><h1 id="login-title">Entre no<br /><em>seu painel.</em></h1><p className="auth-copy">Digite sua key para continuar.</p><form onSubmit={validateKey}><label className="sr-only" htmlFor="key-input">Key de acesso</label><input id="key-input" className="key-input" value={key} onChange={(event) => setKey(event.target.value)} placeholder="INSIRA SUA KEY AQUI..." autoComplete="off" /><button className="login-button" type="submit"><LogIn size={17} /> ENTRAR NO PAINEL</button></form>{error && <p className="auth-error" role="alert">{error}</p>}<p className="auth-footnote">Validação segura pelo Sasarinha Manager.</p></section>
+    <section className="login-box" aria-labelledby="login-title"><div className="login-brand"><img src="/manus-storage/sarinha-mark_265ada7f.png" alt="" /><span>SARINHA<br /><b>PROXY</b></span></div><div className="auth-divider" /><div className="vip-heading"><LockKeyhole size={16} /><span>ACESSO PRIVADO</span></div><h1 id="login-title">Entre no<br /><em>seu painel.</em></h1><p className="auth-copy">Digite sua key para continuar.</p><form onSubmit={validateKey}><label className="sr-only" htmlFor="key-input">Key de acesso</label><input id="key-input" className="key-input" value={key} onChange={(event) => setKey(event.target.value)} placeholder="INSIRA SUA KEY AQUI..." autoComplete="off" /><button className="login-button" type="submit"><LogIn size={17} /> ENTRAR NO PAINEL</button></form><a className="discord-button" href="https://discord.gg/r6cbZukrH" target="_blank" rel="noreferrer"><MessageCircle size={17} /> ENTRAR NO DISCORD</a>{error && <p className="auth-error" role="alert">{error}</p>}<p className="auth-footnote">Validação segura pelo Sasarinha Manager.</p></section>
   </main>;
 
   return <main className="dashboard-screen"><div className="galaxy-bg" aria-hidden="true" />{managerOnline === false && <OfflineBanner ownerAccess />}

@@ -26,13 +26,13 @@ export default function Home() {
   useEffect(() => {
     let cancelled = false;
     async function checkManager() {
-      if (!managerUrl) { setManagerOnline(false); return; }
+      if (!managerUrl) { setManagerOnline(null); return; }
       try {
         const response = await fetch(`${managerUrl}/api/trpc/appStatus`, { headers: { accept: "application/json" } });
         if (!response.ok) throw new Error("status");
         const payload = await response.json();
-        const online = payload?.result?.data?.json?.isOnline ?? payload?.result?.data?.isOnline ?? true;
-        if (!cancelled) setManagerOnline(Boolean(online));
+        const online = payload?.result?.data?.json?.isOnline ?? payload?.result?.data?.isOnline;
+        if (!cancelled) setManagerOnline(typeof online === "boolean" ? online : null);
       } catch { if (!cancelled) setManagerOnline(null); }
     }
     checkManager();
